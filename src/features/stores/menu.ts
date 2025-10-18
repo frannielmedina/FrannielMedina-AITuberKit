@@ -8,6 +8,7 @@ type SettingsTabKey =
   | 'voice'
   | 'speechInput'
   | 'youtube'
+  | 'twitch'
   | 'slide'
   | 'images'
   | 'log'
