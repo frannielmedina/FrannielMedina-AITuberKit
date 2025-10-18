@@ -6,7 +6,7 @@ import {
   addCommentToBuffer,
   TwitchComment,
 } from '@/features/twitch/twitchComments'
-// CORRECCIÓN 1: Importar la clase 'Client' para usarla como tipo.
+// Importa la clase 'Client' para usarla como tipo.
 import TmiClient, { Client } from 'tmi.js' 
 
 const INTERVAL_MILL_SECONDS_RETRIEVING_COMMENTS = 10000 // 10秒
@@ -18,7 +18,7 @@ interface Params {
 const useTwitch = ({ handleSendChat }: Params) => {
   const twitchPlaying = settingsStore((s) => s.twitchPlaying)
   const twitchChannel = settingsStore((s) => s.twitchChannel)
-  // CORRECCIÓN 2: Usar 'Client' (la clase importada) como tipo.
+  // Usa 'Client' como tipo, no el namespace/valor 'TmiClient'
   const clientRef = useRef<Client | null>(null) 
 
   const connectToTwitch = useCallback(() => {
