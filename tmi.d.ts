@@ -60,4 +60,20 @@ declare module 'tmi.js' {
       self: boolean
     ) => void
     error: (err: Error) => void
-    }
+  }
+
+  export class Client {
+    constructor(options?: Options)
+    on<K extends keyof Events>(event: K, listener: Events[K]): this
+    connect(): Promise<[string, number]>
+    disconnect(): Promise<[string, number]>
+    say(channel: string, message: string): Promise<[string]>
+    getChannels(): string[]
+    getOptions(): Options
+    getUsername(): string
+    isMod(channel: string, username: string): boolean
+    readyState(): string
+  }
+
+  export default Client
+}
