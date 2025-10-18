@@ -83,12 +83,8 @@ const Twitch = () => {
                 {t('ConversationContinuityMode')}
               </div>
               <div className="my-2">{t('ConversationContinuityModeInfo')}</div>
-              <div className="my-2">
-                {t('ConversationContinuityModeInfo2')}
-              </div>
-              <div className="mb-4">
-                {t('ConversationContinuityModeInfo3')}
-              </div>
+              <div className="my-2">{t('ConversationContinuityModeInfo2')}</div>
+              <div className="mb-4">{t('ConversationContinuityModeInfo3')}</div>
               <TextButton
                 onClick={() =>
                   settingsStore.setState({
