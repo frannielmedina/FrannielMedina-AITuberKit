@@ -132,6 +132,12 @@ interface Integrations {
   youtubeContinuationCount: number
   youtubeNoCommentCount: number
   youtubeSleepMode: boolean
+  twitchMode: boolean
+  twitchChannel: string
+  twitchPlaying: boolean
+  twitchContinuationCount: number
+  twitchNoCommentCount: number
+  twitchSleepMode: boolean
   conversationContinuityMode: boolean
 }
 
@@ -168,7 +174,6 @@ interface Character {
   lightingIntensity: number
 }
 
-// Preset question type
 export interface PresetQuestion {
   id: string
   text: string
@@ -225,9 +230,7 @@ export type SettingsState = APIKeys &
   General &
   ModelType
 
-// Function to get initial values from environment variables
 const getInitialValuesFromEnv = (): SettingsState => ({
-  // API Keys
   openaiKey:
     process.env.NEXT_PUBLIC_OPENAI_API_KEY ||
     process.env.NEXT_PUBLIC_OPENAI_KEY ||
@@ -255,7 +258,6 @@ const getInitialValuesFromEnv = (): SettingsState => ({
   cartesiaApiKey: '',
   azureEndpoint: process.env.NEXT_PUBLIC_AZURE_ENDPOINT || '',
 
-  // Model Provider
   selectAIService:
     (process.env.NEXT_PUBLIC_SELECT_AI_SERVICE as AIService) || 'openai',
   selectAIModel: migrateOpenAIModelName(
@@ -356,7 +358,6 @@ const getInitialValuesFromEnv = (): SettingsState => ({
   customApiIncludeMimeType:
     process.env.NEXT_PUBLIC_CUSTOM_API_INCLUDE_MIME_TYPE !== 'false',
 
-  // Integrations
   difyUrl: '',
   difyConversationId: '',
   youtubeMode: process.env.NEXT_PUBLIC_YOUTUBE_MODE === 'true' ? true : false,
@@ -366,9 +367,14 @@ const getInitialValuesFromEnv = (): SettingsState => ({
   youtubeContinuationCount: 0,
   youtubeNoCommentCount: 0,
   youtubeSleepMode: false,
+  twitchMode: process.env.NEXT_PUBLIC_TWITCH_MODE === 'true' ? true : false,
+  twitchChannel: process.env.NEXT_PUBLIC_TWITCH_CHANNEL || '',
+  twitchPlaying: false,
+  twitchContinuationCount: 0,
+  twitchNoCommentCount: 0,
+  twitchSleepMode: false,
   conversationContinuityMode: false,
 
-  // Character
   characterName: process.env.NEXT_PUBLIC_CHARACTER_NAME || 'CHARACTER',
   characterPreset1: process.env.NEXT_PUBLIC_CHARACTER_PRESET1 || SYSTEM_PROMPT,
   characterPreset2: process.env.NEXT_PUBLIC_CHARACTER_PRESET2 || SYSTEM_PROMPT,
@@ -409,7 +415,6 @@ const getInitialValuesFromEnv = (): SettingsState => ({
   lightingIntensity:
     parseFloat(process.env.NEXT_PUBLIC_LIGHTING_INTENSITY || '1.0') || 1.0,
 
-  // General
   selectLanguage: (process.env.NEXT_PUBLIC_SELECT_LANGUAGE as Language) || 'ja',
   changeEnglishToJapanese:
     process.env.NEXT_PUBLIC_CHANGE_ENGLISH_TO_JAPANESE === 'true',
@@ -505,10 +510,8 @@ const getInitialValuesFromEnv = (): SettingsState => ({
       | 'forest'
       | 'sunset') || 'default',
 
-  // Custom model toggle
   customModel: process.env.NEXT_PUBLIC_CUSTOM_MODEL === 'true',
 
-  // NijiVoice settings
   nijivoiceApiKey: '',
   nijivoiceActorId: process.env.NEXT_PUBLIC_NIJIVOICE_ACTOR_ID || '',
   nijivoiceSpeed:
@@ -520,10 +523,8 @@ const getInitialValuesFromEnv = (): SettingsState => ({
     parseFloat(process.env.NEXT_PUBLIC_NIJIVOICE_SOUND_DURATION || '0.1') ||
     0.1,
 
-  // Settings
   modelType: (process.env.NEXT_PUBLIC_MODEL_TYPE as 'vrm' | 'live2d') || 'vrm',
 
-  // Live2D settings
   neutralEmotions: process.env.NEXT_PUBLIC_NEUTRAL_EMOTIONS?.split(',') || [],
   happyEmotions: process.env.NEXT_PUBLIC_HAPPY_EMOTIONS?.split(',') || [],
   sadEmotions: process.env.NEXT_PUBLIC_SAD_EMOTIONS?.split(',') || [],
@@ -544,7 +545,6 @@ const settingsStore = create<SettingsState>()(
   persist((set, get) => getInitialValuesFromEnv(), {
     name: 'aitube-kit-settings',
     onRehydrateStorage: () => (state) => {
-      // Migrate OpenAI model names when loading from storage
       if (state && state.selectAIService === 'openai' && state.selectAIModel) {
         const migratedModel = migrateOpenAIModelName(state.selectAIModel)
         if (migratedModel !== state.selectAIModel) {
@@ -552,7 +552,6 @@ const settingsStore = create<SettingsState>()(
         }
       }
 
-      // Override with environment variables if the option is enabled
       if (
         state &&
         process.env.NEXT_PUBLIC_ALWAYS_OVERRIDE_WITH_ENV_VARIABLES === 'true'
@@ -626,6 +625,7 @@ const settingsStore = create<SettingsState>()(
       difyUrl: state.difyUrl,
       difyConversationId: state.difyConversationId,
       youtubeLiveId: state.youtubeLiveId,
+      twitchChannel: state.twitchChannel,
       characterName: state.characterName,
       characterPreset1: state.characterPreset1,
       characterPreset2: state.characterPreset2,
