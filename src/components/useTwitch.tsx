@@ -17,7 +17,7 @@ interface Params {
 const useTwitch = ({ handleSendChat }: Params) => {
   const twitchPlaying = settingsStore((s) => s.twitchPlaying)
   const twitchChannel = settingsStore((s) => s.twitchChannel)
-  const clientRef = useRef<InstanceType<typeof tmi.Client> | null>(null)
+  const clientRef = useRef<tmi.Client | null>(null)
 
   const connectToTwitch = useCallback(() => {
     const ss = settingsStore.getState()
