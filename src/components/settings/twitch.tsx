@@ -63,63 +63,55 @@ const Twitch = () => {
         )}
       </div>
       <div className="mt-4">
-        {(() => {
-          if (twitchMode) {
-            return (
-              <>
-                <div className="">{t('TwitchInfo')}</div>
-                <div className="my-4 text-xl font-bold">
-                  {t('TwitchChannel')}
-                </div>
-                <input
-                  className="text-ellipsis px-4 py-2 w-col-span-2 bg-white hover:bg-white-hover rounded-lg"
-                  type="text"
-                  placeholder="channel_name"
-                  value={twitchChannel}
-                  onChange={(e) =>
-                    settingsStore.setState({
-                      twitchChannel: e.target.value,
-                    })
-                  }
-                />
-                <div className="mt-6">
-                  <div className="my-4 text-xl font-bold">
-                    {t('ConversationContinuityMode')}
-                  </div>
-                  <div className="my-2">
-                    {t('ConversationContinuityModeInfo')}
-                  </div>
-                  <div className="my-2">
-                    {t('ConversationContinuityModeInfo2')}
-                  </div>
-                  <div className="mb-4">
-                    {t('ConversationContinuityModeInfo3')}
-                  </div>
-                  <TextButton
-                    onClick={() =>
-                      settingsStore.setState({
-                        conversationContinuityMode: !conversationContinuityMode,
-                      })
-                    }
-                    disabled={
-                      !isMultiModalAvailable(
-                        selectAIService,
-                        selectAIModel,
-                        enableMultiModal,
-                        multiModalMode,
-                        customModel
-                      ) ||
-                      slideMode ||
-                      externalLinkageMode
-                    }
-                  >
-                    {t(conversationContinuityMode ? 'StatusOn' : 'StatusOff')}
-                  </TextButton>
-                </div>
-              </>
-            )
-          }
-        })()}
+        {twitchMode && (
+          <>
+            <div className="">{t('TwitchInfo')}</div>
+            <div className="my-4 text-xl font-bold">{t('TwitchChannel')}</div>
+            <input
+              className="text-ellipsis px-4 py-2 w-col-span-2 bg-white hover:bg-white-hover rounded-lg"
+              type="text"
+              placeholder="channel_name"
+              value={twitchChannel}
+              onChange={(e) =>
+                settingsStore.setState({
+                  twitchChannel: e.target.value,
+                })
+              }
+            />
+            <div className="mt-6">
+              <div className="my-4 text-xl font-bold">
+                {t('ConversationContinuityMode')}
+              </div>
+              <div className="my-2">{t('ConversationContinuityModeInfo')}</div>
+              <div className="my-2">
+                {t('ConversationContinuityModeInfo2')}
+              </div>
+              <div className="mb-4">
+                {t('ConversationContinuityModeInfo3')}
+              </div>
+              <TextButton
+                onClick={() =>
+                  settingsStore.setState({
+                    conversationContinuityMode: !conversationContinuityMode,
+                  })
+                }
+                disabled={
+                  !isMultiModalAvailable(
+                    selectAIService,
+                    selectAIModel,
+                    enableMultiModal,
+                    multiModalMode,
+                    customModel
+                  ) ||
+                  slideMode ||
+                  externalLinkageMode
+                }
+              >
+                {t(conversationContinuityMode ? 'StatusOn' : 'StatusOff')}
+              </TextButton>
+            </div>
+          </>
+        )}
       </div>
     </>
   )
