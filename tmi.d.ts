@@ -81,5 +81,9 @@ declare module 'tmi.js' {
     readyState(): string
   }
 
-  export default Client
+  namespace tmi {
+    export { Client, ChatUserstate, Options }
+  }
+
+  export default tmi
 }
