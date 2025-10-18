@@ -11,6 +11,7 @@ import Character from './character'
 import AI from './ai'
 import Voice from './voice'
 import YouTube from './youtube'
+import Twitch from './twitch'
 import Slide from './slide'
 import Log from './log'
 import Other from './other'
@@ -54,6 +55,7 @@ type TabKey =
   | 'ai'
   | 'voice'
   | 'youtube'
+  | 'twitch'
   | 'slide'
   | 'images'
   | 'log'
@@ -68,6 +70,7 @@ const tabIconMapping: Record<TabKey, string> = {
   ai: '/images/setting-icons/ai-settings.svg',
   voice: '/images/setting-icons/voice-settings.svg',
   youtube: '/images/setting-icons/youtube-settings.svg',
+  twitch: '/images/setting-icons/twitch-settings.svg',
   slide: '/images/setting-icons/slide-settings.svg',
   images: '/images/setting-icons/image-settings.svg',
   log: '/images/setting-icons/conversation-history.svg',
@@ -136,6 +139,10 @@ const Main = () => {
       label: t('YoutubeSettings'),
     },
     {
+      key: 'twitch',
+      label: t('TwitchSettings'),
+    },
+    {
       key: 'slide',
       label: t('SlideSettings'),
     },
@@ -167,6 +174,8 @@ const Main = () => {
         return <Voice />
       case 'youtube':
         return <YouTube />
+      case 'twitch':
+        return <Twitch />
       case 'slide':
         return <Slide />
       case 'images':
