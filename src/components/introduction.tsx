@@ -1,6 +1,7 @@
 import i18n from 'i18next'
 import { useEffect, useState } from 'react'
 import { useTranslation, Trans } from 'react-i18next'
+import Image from 'next/image'
 
 import homeStore from '@/features/stores/home'
 import settingsStore from '@/features/stores/settings'
@@ -36,7 +37,6 @@ export const Introduction = () => {
     setOpened(false)
     updateLanguage()
 
-    // Only update showIntroduction if "don't show again" is checked
     if (dontShowAgain) {
       homeStore.setState({
         showIntroduction: false,
@@ -55,14 +55,42 @@ export const Introduction = () => {
             className="bg-secondary hover:bg-secondary-hover active:bg-secondary-press disabled:bg-secondary-disabled text-theme"
           ></IconButton>
         </div>
+
+        <div className="flex items-center justify-center mb-6">
+          <Image
+            src="/franniellogo.png"
+            alt="Franniel Logo"
+            width={60}
+            height={60}
+            className="mr-3"
+          />
+          <div>
+            <div className="font-bold text-2xl text-secondary">AiTuberKit</div>
+            <div className="text-sm text-gray-600">
+              Modded by Franniel Medina
+            </div>
+          </div>
+        </div>
+
         <div className="mb-6">
           <div className="mb-2 font-bold text-xl text-secondary ">
             {t('AboutThisApplication')}
           </div>
-          <div>
-            <Trans i18nKey="AboutThisApplicationDescription2" />
+          <div className="mb-4">
+            This is a fork of the original ChatVRM{' '}
+            <Link
+              url={'https://github.com/pixiv/ChatVRM'}
+              label={'https://github.com/pixiv/ChatVRM'}
+            />{' '}
+            and the original AiTuberKit{' '}
+            <Link
+              url={'https://github.com/tegnike/aituber-kit'}
+              label={'https://github.com/tegnike/aituber-kit'}
+            />{' '}
+            to improve Twitch integration.
           </div>
         </div>
+
         <div className="my-6">
           <div className="my-2 font-bold text-xl text-secondary">
             {t('TechnologyIntroduction')}
@@ -105,17 +133,21 @@ export const Introduction = () => {
             />
             {t('TechnologyIntroductionDescription7')}
           </div>
-          <div className="my-4">
-            {t('SourceCodeDescription1')}
-            <br />
-            {t('RepositoryURL')}
-            <span> </span>
-            <Link
-              url={'https://github.com/tegnike/aituber-kit'}
-              label={'https://github.com/tegnike/aituber-kit'}
-            />
+        </div>
+
+        <div className="my-6 border-t pt-6">
+          <div className="text-center text-sm text-gray-600">
+            <div className="mb-2">©2025 Franniel Medina</div>
+            <div className="mb-3">All rights reserved</div>
+            <a
+              href="https://beacons.ai/frannielmedinatv"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:text-blue-800 hover:underline transition-all duration-300"
+            >
+              beacons.ai/frannielmedinatv
+            </a>
           </div>
-          <div className="my-4">{t('SourceCodeDescription2')}</div>
         </div>
 
         <div className="my-6">
