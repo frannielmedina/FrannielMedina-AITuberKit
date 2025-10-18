@@ -6,7 +6,8 @@ import {
   addCommentToBuffer,
   TwitchComment,
 } from '@/features/twitch/twitchComments'
-import TmiClient from 'tmi.js'
+// CORRECCIÓN 1: Importar la clase 'Client' para usarla como tipo.
+import TmiClient, { Client } from 'tmi.js' 
 
 const INTERVAL_MILL_SECONDS_RETRIEVING_COMMENTS = 10000 // 10秒
 
@@ -17,7 +18,8 @@ interface Params {
 const useTwitch = ({ handleSendChat }: Params) => {
   const twitchPlaying = settingsStore((s) => s.twitchPlaying)
   const twitchChannel = settingsStore((s) => s.twitchChannel)
-  const clientRef = useRef<TmiClient | null>(null)
+  // CORRECCIÓN 2: Usar 'Client' (la clase importada) como tipo.
+  const clientRef = useRef<Client | null>(null) 
 
   const connectToTwitch = useCallback(() => {
     const ss = settingsStore.getState()
@@ -30,7 +32,6 @@ const useTwitch = ({ handleSendChat }: Params) => {
       ? ss.twitchChannel
       : `#${ss.twitchChannel}`
 
-    // Formato corregido para cumplir con Prettier
     const client = new TmiClient({
       options: {
         debug: false,
