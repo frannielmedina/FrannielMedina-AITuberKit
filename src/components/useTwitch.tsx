@@ -6,7 +6,7 @@ import {
   addCommentToBuffer,
   TwitchComment,
 } from '@/features/twitch/twitchComments'
-import tmi from 'tmi.js'
+import TmiClient from 'tmi.js' // ← CAMBIADO: import default
 
 const INTERVAL_MILL_SECONDS_RETRIEVING_COMMENTS = 10000 // 10秒
 
@@ -17,7 +17,7 @@ interface Params {
 const useTwitch = ({ handleSendChat }: Params) => {
   const twitchPlaying = settingsStore((s) => s.twitchPlaying)
   const twitchChannel = settingsStore((s) => s.twitchChannel)
-  const clientRef = useRef<tmi.Client | null>(null)
+  const clientRef = useRef<TmiClient | null>(null) // ← CAMBIADO: TmiClient en lugar de tmi.Client
 
   const connectToTwitch = useCallback(() => {
     const ss = settingsStore.getState()
@@ -30,7 +30,7 @@ const useTwitch = ({ handleSendChat }: Params) => {
       ? ss.twitchChannel
       : `#${ss.twitchChannel}`
 
-    const client = new tmi.Client({
+    const client = new TmiClient({ // ← CAMBIADO: TmiClient en lugar de tmi.Client
       options: { debug: false },
       connection: {
         reconnect: true,
