@@ -46,6 +46,8 @@ export const Menu = () => {
   const customModel = settingsStore((s) => s.customModel)
   const youtubeMode = settingsStore((s) => s.youtubeMode)
   const youtubePlaying = settingsStore((s) => s.youtubePlaying)
+  const twitchMode = settingsStore((s) => s.twitchMode)
+  const twitchPlaying = settingsStore((s) => s.twitchPlaying)
   const slideMode = settingsStore((s) => s.slideMode)
   const slideVisible = menuStore((s) => s.slideVisible)
   const chatLog = homeStore((s) => s.chatLog)
@@ -183,25 +185,34 @@ export const Menu = () => {
     }
   }, [youtubePlaying])
 
+  useEffect(() => {
+    if (!twitchPlaying) {
+      settingsStore.setState({
+        twitchContinuationCount: 0,
+        twitchNoCommentCount: 0,
+        twitchSleepMode: false,
+      })
+    }
+  }, [twitchPlaying])
+
   const toggleCapture = useCallback(() => {
     menuStore.setState(({ showCapture }) => ({ showCapture: !showCapture }))
-    menuStore.setState({ showWebcam: false }) // Captureを表示するときWebcamを非表示にする
+    menuStore.setState({ showWebcam: false })
     if (!showCapture) {
-      homeStore.setState({ webcamStatus: false }) // Ensure webcam status is false when enabling capture
+      homeStore.setState({ webcamStatus: false })
     }
   }, [showCapture])
 
   const toggleWebcam = useCallback(() => {
     menuStore.setState(({ showWebcam }) => ({ showWebcam: !showWebcam }))
-    menuStore.setState({ showCapture: false }) // Webcamを表示するときCaptureを非表示にする
+    menuStore.setState({ showCapture: false })
     if (!showWebcam) {
-      homeStore.setState({ captureStatus: false }) // Ensure capture status is false when enabling webcam
+      homeStore.setState({ captureStatus: false })
     }
   }, [showWebcam])
 
   return (
     <>
-      {/* ロングタップ用の透明な領域（モバイルでコントロールパネルが非表示の場合） */}
       {isMobile === true && !showControlPanel && (
         <div
           className="absolute top-0 left-0 z-30 w-20 h-20"
@@ -241,7 +252,7 @@ export const Menu = () => {
                   onClick={() => setChatLogMode((prev) => (prev + 1) % 3)}
                 />
               </div>
-              {!youtubeMode && (
+              {!youtubeMode && !twitchMode && (
                 <>
                   <div className="order-3">
                     <IconButton
@@ -299,6 +310,19 @@ export const Menu = () => {
                     onClick={() =>
                       settingsStore.setState({
                         youtubePlaying: !youtubePlaying,
+                      })
+                    }
+                  />
+                </div>
+              )}
+              {twitchMode && (
+                <div className="order-5">
+                  <IconButton
+                    iconName={twitchPlaying ? '24/PauseAlt' : '24/Video'}
+                    isProcessing={false}
+                    onClick={() =>
+                      settingsStore.setState({
+                        twitchPlaying: !twitchPlaying,
                       })
                     }
                   />
