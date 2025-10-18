@@ -17,6 +17,7 @@ import settingsStore from '@/features/stores/settings'
 import '@/lib/i18n'
 import { buildUrl } from '@/utils/buildUrl'
 import { YoutubeManager } from '@/components/youtubeManager'
+import { TwitchManager } from '@/components/twitchManager'
 import toastStore from '@/features/stores/toast'
 
 const Home = () => {
@@ -59,7 +60,6 @@ const Home = () => {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if ((event.metaKey || event.ctrlKey) && event.shiftKey) {
-        // shiftキーを押しながら数字キーを押すためのマッピング
         const keyMap: { [key: string]: number } = {
           Digit1: 1,
           Digit2: 2,
@@ -110,6 +110,7 @@ const Home = () => {
       <Toasts />
       <WebSocketManager />
       <YoutubeManager />
+      <TwitchManager />
       <CharacterPresetMenu />
       <ImageOverlay />
     </div>
