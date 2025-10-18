@@ -6,7 +6,7 @@ import {
   addCommentToBuffer,
   TwitchComment,
 } from '@/features/twitch/twitchComments'
-import TmiClient from 'tmi.js' // ← CAMBIADO: import default
+import TmiClient from 'tmi.js'
 
 const INTERVAL_MILL_SECONDS_RETRIEVING_COMMENTS = 10000 // 10秒
 
@@ -17,7 +17,7 @@ interface Params {
 const useTwitch = ({ handleSendChat }: Params) => {
   const twitchPlaying = settingsStore((s) => s.twitchPlaying)
   const twitchChannel = settingsStore((s) => s.twitchChannel)
-  const clientRef = useRef<TmiClient | null>(null) // ← CAMBIADO: TmiClient en lugar de tmi.Client
+  const clientRef = useRef<TmiClient | null>(null)
 
   const connectToTwitch = useCallback(() => {
     const ss = settingsStore.getState()
@@ -30,8 +30,7 @@ const useTwitch = ({ handleSendChat }: Params) => {
       ? ss.twitchChannel
       : `#${ss.twitchChannel}`
 
-    // CORRECCIÓN DE FORMATO: El objeto de opciones ahora está expandido
-    // para cumplir con las reglas de Prettier que causaban el error 33:35.
+    // Formato corregido para cumplir con Prettier
     const client = new TmiClient({
       options: {
         debug: false,
@@ -103,11 +102,6 @@ const useTwitch = ({ handleSendChat }: Params) => {
     await fetchAndProcessComments(handleSendChat)
   }, [handleSendChat])
 
-  // NOTA IMPORTANTE: Esta es la función donde anteriormente se reportó
-  // la advertencia de React Hook: "useCallback has a missing dependency: 'addToast'".
-  // Si la función 'addToast' se usa en alguna parte de este componente 
-  // (aunque no esté visible en el código que enviaste), debes añadirla 
-  // a este array de dependencias si viene de props o de otro hook.
   useEffect(() => {
     if (!twitchPlaying) {
       disconnectFromTwitch()
