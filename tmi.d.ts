@@ -75,9 +75,12 @@ declare module 'tmi.js' {
     readyState(): string
   }
 
-  const tmi: {
+  export type TmiClient = Client
+
+  interface TmiStatic {
     Client: typeof Client
   }
 
+  const tmi: TmiStatic
   export default tmi
 }
