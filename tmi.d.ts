@@ -1,86 +1,130 @@
-declare module 'tmi.js' {
-  export interface ChatUserstate {
-    'badge-info'?: string
-    'badge-info-raw'?: string
-    badges?: { [key: string]: string }
-    'badges-raw'?: string
-    color?: string
-    'display-name'?: string
-    emotes?: { [key: string]: string[] }
-    'emotes-raw'?: string
-    flags?: string
-    id?: string
-    mod?: boolean
-    'room-id'?: string
-    subscriber?: boolean
-    'tmi-sent-ts'?: string
-    turbo?: boolean
-    'user-id'?: string
-    'user-type'?: '' | 'mod' | 'global_mod' | 'admin' | 'staff'
-    username?: string
-    'message-type'?: 'chat' | 'action' | 'whisper'
-  }
+import { useCallback, useEffect, useRef } from 'react'
+import homeStore from '@/features/stores/home'
+import settingsStore from '@/features/stores/settings'
+import {
+  fetchAndProcessComments,
+  addCommentToBuffer,
+  TwitchComment,
+} from '@/features/twitch/twitchComments'
+import tmi, { TmiClient } from 'tmi.js'
 
-  export interface Options {
-    options?: {
-      debug?: boolean
-      messagesLogLevel?: 'info' | 'warn' | 'error'
-      clientId?: string
-    }
-    connection?: {
-      reconnect?: boolean
-      secure?: boolean
-      timeout?: number
-      reconnectDecay?: number
-      reconnectInterval?: number
-    }
-    identity?: {
-      username?: string
-      password?: string
-    }
-    channels?: string[]
-  }
+const INTERVAL_MILL_SECONDS_RETRIEVING_COMMENTS = 10000 // 10秒
 
-  export interface Events {
-    connecting: (address: string, port: number) => void
-    connected: (address: string, port: number) => void
-    disconnected: (reason: string) => void
-    reconnect: () => void
-    logon: () => void
-    message: (
-      channel: string,
-      userstate: ChatUserstate,
-      message: string,
-      self: boolean
-    ) => void
-    chat: (
-      channel: string,
-      userstate: ChatUserstate,
-      message: string,
-      self: boolean
-    ) => void
-    error: (err: Error) => void
-  }
-
-  export class Client {
-    constructor(options?: Options)
-    on<K extends keyof Events>(event: K, listener: Events[K]): this
-    connect(): Promise<[string, number]>
-    disconnect(): Promise<[string, number]>
-    say(channel: string, message: string): Promise<[string]>
-    getChannels(): string[]
-    getOptions(): Options
-    getUsername(): string
-    isMod(channel: string, username: string): boolean
-    readyState(): string
-  }
-
-  export type TmiClient = Client
-
-  interface TmiStatic {
-    Client: typeof Client
-  }
-
-  const tmi: TmiStatic
-  export default tmi
+interface Params {
+  handleSendChat: (text: string) => Promise<void>
 }
+
+const useTwitch = ({ handleSendChat }: Params) => {
+  const twitchPlaying = settingsStore((s) => s.twitchPlaying)
+  const twitchChannel = settingsStore((s) => s.twitchChannel)
+  const clientRef = useRef<TmiClient | null>(null)
+
+  const connectToTwitch = useCallback(() => {
+    const ss = settingsStore.getState()
+
+    if (!ss.twitchChannel || !ss.twitchMode) {
+      return
+    }
+
+    const channelName = ss.twitchChannel.startsWith('#')
+      ? ss.twitchChannel
+      : `#${ss.twitchChannel}`
+
+    const client = new tmi.Client({
+      options: {
+        debug: false,
+      },
+      connection: {
+        reconnect: true,
+        secure: true,
+      },
+      channels: [channelName],
+    })
+
+    client.on('message', (channel, tags, message, self) => {
+      if (self || !message.trim() || message.startsWith('#')) return
+
+      const comment: TwitchComment = {
+        userName: tags['display-name'] || tags.username || 'Anonymous',
+        userComment: message.trim(),
+        userId: tags['user-id'],
+        userColor: tags.color,
+      }
+
+      console.log(`[Twitch] ${comment.userName}: ${comment.userComment}`)
+      addCommentToBuffer(comment)
+    })
+
+    client.on('connected', (address, port) => {
+      console.log(`[Twitch] Connected to ${address}:${port}`)
+    })
+
+    client.on('disconnected', (reason) => {
+      console.log(`[Twitch] Disconnected: ${reason}`)
+    })
+
+    client.on('error', (err) => {
+      console.error('[Twitch] Error:', err)
+    })
+
+    client
+      .connect()
+      .catch((err) => console.error('[Twitch] Connection error:', err))
+
+    clientRef.current = client
+  }, [])
+
+  const disconnectFromTwitch = useCallback(() => {
+    if (clientRef.current) {
+      clientRef.current
+        .disconnect()
+        .catch((err) => console.error('[Twitch] Disconnect error:', err))
+      clientRef.current = null
+    }
+  }, [])
+
+  const fetchAndProcessCommentsCallback = useCallback(async () => {
+    const ss = settingsStore.getState()
+    const hs = homeStore.getState()
+
+    if (
+      !ss.twitchChannel ||
+      hs.chatProcessing ||
+      hs.chatProcessingCount > 0 ||
+      !ss.twitchMode ||
+      !ss.twitchPlaying
+    ) {
+      return
+    }
+
+    console.log('Call fetchAndProcessComments (Twitch) !!!')
+    await fetchAndProcessComments(handleSendChat)
+  }, [handleSendChat])
+
+  useEffect(() => {
+    if (!twitchPlaying) {
+      disconnectFromTwitch()
+      return
+    }
+
+    connectToTwitch()
+    fetchAndProcessCommentsCallback()
+
+    const intervalId = setInterval(() => {
+      fetchAndProcessCommentsCallback()
+    }, INTERVAL_MILL_SECONDS_RETRIEVING_COMMENTS)
+
+    return () => {
+      clearInterval(intervalId)
+      disconnectFromTwitch()
+    }
+  }, [
+    twitchPlaying,
+    twitchChannel,
+    fetchAndProcessCommentsCallback,
+    connectToTwitch,
+    disconnectFromTwitch,
+  ])
+}
+
+export default useTwitch
