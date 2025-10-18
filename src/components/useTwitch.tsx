@@ -30,8 +30,12 @@ const useTwitch = ({ handleSendChat }: Params) => {
       ? ss.twitchChannel
       : `#${ss.twitchChannel}`
 
-    const client = new TmiClient({ // ← CAMBIADO: TmiClient en lugar de tmi.Client
-      options: { debug: false },
+    // CORRECCIÓN DE FORMATO: El objeto de opciones ahora está expandido
+    // para cumplir con las reglas de Prettier que causaban el error 33:35.
+    const client = new TmiClient({
+      options: {
+        debug: false,
+      },
       connection: {
         reconnect: true,
         secure: true,
@@ -99,6 +103,11 @@ const useTwitch = ({ handleSendChat }: Params) => {
     await fetchAndProcessComments(handleSendChat)
   }, [handleSendChat])
 
+  // NOTA IMPORTANTE: Esta es la función donde anteriormente se reportó
+  // la advertencia de React Hook: "useCallback has a missing dependency: 'addToast'".
+  // Si la función 'addToast' se usa en alguna parte de este componente 
+  // (aunque no esté visible en el código que enviaste), debes añadirla 
+  // a este array de dependencias si viene de props o de otro hook.
   useEffect(() => {
     if (!twitchPlaying) {
       disconnectFromTwitch()
